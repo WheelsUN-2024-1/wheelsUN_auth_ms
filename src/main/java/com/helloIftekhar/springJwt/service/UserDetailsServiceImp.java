@@ -16,8 +16,8 @@
         }
 
         @Override
-        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            return repository.findByUsername(username)
+        public UserDetails loadUserByUsername(String userId ) throws UsernameNotFoundException {
+            return repository.findByUserId(userId)
                     .orElseThrow(()-> new UsernameNotFoundException("User not found"));
         }
     }

@@ -3,6 +3,7 @@ package com.helloIftekhar.springJwt.config;
 
 import com.helloIftekhar.springJwt.filter.JwtAuthenticationFilter;
 import com.helloIftekhar.springJwt.service.UserDetailsServiceImp;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -57,11 +58,17 @@ public class SecurityConfig {
                                         (request, response, accessDeniedException)->response.setStatus(403)
                                 )
                                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .logout(l->l
+                .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler(logoutHandler)
-                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()
-                        ))
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            SecurityContextHolder.clearContext();
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json");
+                            response.getWriter().print("{\"message\":\"Logout successful\"}");
+                            response.getWriter().flush();
+                        })
+                )
                 .build();
 
     }

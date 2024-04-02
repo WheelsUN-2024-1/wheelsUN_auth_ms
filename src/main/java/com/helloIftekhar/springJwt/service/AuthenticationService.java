@@ -2,20 +2,16 @@ package com.helloIftekhar.springJwt.service;
 
 
 import com.helloIftekhar.springJwt.model.AuthenticationResponse;
-import com.helloIftekhar.springJwt.model.Role;
 import com.helloIftekhar.springJwt.model.Token;
 import com.helloIftekhar.springJwt.model.User;
 import com.helloIftekhar.springJwt.repository.TokenRepository;
 import com.helloIftekhar.springJwt.repository.UserRepository;
-import jakarta.persistence.Column;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -45,18 +41,14 @@ public class AuthenticationService {
     public AuthenticationResponse register(User request) {
 
         // check if user already exist. if exist than authenticate the user
-        if(repository.findByUsername(request.getUsername()).isPresent()) {
+        if(repository.findByUserId(request.getUserId()).isPresent()) {
             return new AuthenticationResponse(null, "User already exist");
         }
 
         User user = new User();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setUsername(request.getUsername());
+        user.setUserId(request.getUserId());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-
-        user.setRole(request.getRole());
 
         user = repository.save(user);
 
@@ -76,7 +68,7 @@ public class AuthenticationService {
                 )
         );
 
-        User user = repository.findByUsername(request.getUsername()).orElseThrow();
+        User user = repository.findByUserId(request.getUsername()).orElseThrow();
         String jwt = jwtService.generateToken(user);
 
         revokeAllTokenByUser(user);
@@ -99,10 +91,27 @@ public class AuthenticationService {
         tokenRepository.saveAll(validTokens);
     }
     private void saveUserToken(String jwt, User user) {
-        Token token = new Token();
+
+        Token token = user.getToken();
+        if (token == null) {
+
+            token = new Token();
+            token.setUser(user);
+            user.setToken(token);
+        }
+
         token.setToken(jwt);
         token.setLoggedOut(false);
-        token.setUser(user);
-        tokenRepository.save(token);
+
+
+        repository.save(user);
     }
+
+    public void logout(String token) {
+        tokenRepository.findByToken(token).ifPresent(t -> {
+            t.setLoggedOut(true);
+            tokenRepository.save(t);
+        });
+    }
+
 }
