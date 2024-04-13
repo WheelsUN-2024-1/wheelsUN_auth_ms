@@ -14,7 +14,7 @@ A simple and secure microservice for managing authentication and authorization i
 - **Spring Web**: To build RESTful applications using Spring MVC.
 - **Spring Security**: For secure authentication and access-control.
 - **Spring Data JPA**: To persist data in SQL stores using Java Persistence API.
-- **´PostgreSQL Driver**: To connect to PostgreSQL databases.
+- **PostgreSQL Driver**: To connect to PostgreSQL databases.
 
 ## Quick Start
 
