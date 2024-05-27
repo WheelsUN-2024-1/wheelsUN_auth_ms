@@ -6,7 +6,7 @@ spring:
     password: wheels2024
   jpa:
     hibernate:
-      ddl-auto: create-only
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
